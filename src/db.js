@@ -5,7 +5,7 @@ const connectDB = async () => {
     await mongoose.connect(process.env.MONGO_URI);
     console.log('db start');
   } catch (error) {
-    console.error('db ne start', error);
+    console.error('db nestart', error);
     process.exit(1);
   }
 };

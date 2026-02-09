@@ -31,7 +31,7 @@ router.get('/', async (req, res) => {
   res.json(result);
 });
 
-// ✏ обновление пользователя
+// обновление пользователя
 router.patch('/:id', auth, async (req, res) => {
   try {
     const targetId = req.params.id;
@@ -63,7 +63,7 @@ router.patch('/:id', auth, async (req, res) => {
   }
 });
 
-// 🗑 удаление пользователя
+// удаление пользователя
 router.delete('/:id', auth, async (req, res) => {
   try {
     const targetId = req.params.id;
@@ -82,7 +82,7 @@ router.delete('/:id', auth, async (req, res) => {
   }
 });
 
-// 📸 загрузка аватара
+// загрузка аватара
 router.post(
   '/:id/avatar',
   auth,
@@ -134,7 +134,7 @@ router.post(
   }
 );
 
-// 🗑 удаление аватара
+// удаление аватара
 router.delete('/:id/avatar', auth, async (req, res) => {
   try {
     const targetId = req.params.id;

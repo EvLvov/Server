@@ -15,6 +15,7 @@ connectDB();
 // роуты
 app.use('/api/users', require('./routes/users'));
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api/posts', require('./routes/posts'));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
@@ -26,3 +27,5 @@ app.use('/uploads', express.static('uploads'));
 
 
 //const BASE_URL = process.env.BASE_URL;
+
+// mongorestore dump

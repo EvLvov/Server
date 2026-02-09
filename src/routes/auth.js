@@ -9,7 +9,7 @@ const { buildAvatar } = require('../utils/avatar');
 
 const router = express.Router();
 
-// REGISTER
+// Register
 router.post('/register', async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -43,7 +43,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// LOGIN
+// Login
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -59,12 +59,12 @@ router.post('/login', async (req, res) => {
     }
 
     const token = jwt.sign(
-  {
+    {
     userId: user._id,
     role: user.role,
-  },
-  process.env.JWT_SECRET,
-  { expiresIn: process.env.JWT_EXPIRES_IN }
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: process.env.JWT_EXPIRES_IN }
  );
 
 
@@ -74,7 +74,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// 🔓 LOGOUT
+// logout
 router.post('/logout', auth, async (req, res) => {
   const token = req.headers.authorization.split(' ')[1];
   const decoded = jwt.decode(token);
@@ -96,13 +96,12 @@ router.get('/me', auth, async (req, res) => {
   });
 });
 
-
-
+// admin
 router.get('/admin', auth, role(['admin']), (req, res) => {
-  res.json({ message: 'Welcome, admin 👑' });
+  res.json({ message: 'Welcome admin' });
 });
 
-// ⚠ DEV ONLY — назначить админа
+// назначить админа
 router.post('/make-admin', async (req, res) => {
   try {
     const { email } = req.body;
@@ -118,7 +117,7 @@ router.post('/make-admin', async (req, res) => {
     }
 
     res.json({
-      message: 'User is now admin 👑',
+      message: 'You admin',
       user,
     });
   } catch (e) {
