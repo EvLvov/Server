@@ -9,7 +9,7 @@ const router = express.Router();
 const { buildAvatar } = require('../utils/avatar');
 
 
-// создать пользователя
+// create user
 router.post('/', async (req, res) => {
   try {
     const user = await User.create(req.body);
@@ -19,7 +19,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-// получить всех пользователей
+// get users
 router.get('/', async (req, res) => {
   const users = await User.find();
 
@@ -31,13 +31,12 @@ router.get('/', async (req, res) => {
   res.json(result);
 });
 
-// обновление пользователя
+// update
 router.patch('/:id', auth, async (req, res) => {
   try {
     const targetId = req.params.id;
     const requester = req.user;
 
-    // проверка доступа
     if (
       requester.role !== 'admin' &&
       requester.userId !== targetId
@@ -45,7 +44,6 @@ router.patch('/:id', auth, async (req, res) => {
       return res.status(403).json({ message: 'Forbidden' });
     }
 
-    // запрещаем менять роль и пароль через этот роут
     const allowedUpdates = {
       name: req.body.name,
       email: req.body.email,
@@ -63,13 +61,12 @@ router.patch('/:id', auth, async (req, res) => {
   }
 });
 
-// удаление пользователя
+// delete user
 router.delete('/:id', auth, async (req, res) => {
   try {
     const targetId = req.params.id;
     const requester = req.user;
 
-    // удалять может только админ
     if (requester.role !== 'admin') {
       return res.status(403).json({ message: 'Admins only' });
     }
@@ -82,7 +79,8 @@ router.delete('/:id', auth, async (req, res) => {
   }
 });
 
-// загрузка аватара
+
+// download
 router.post(
   '/:id/avatar',
   auth,
@@ -103,8 +101,9 @@ router.post(
         return res.status(400).json({ message: 'No file' });
       }
 
-      const smallPath = `uploads/avatars/${targetId}_100.jpg`;
-      const largePath = `uploads/avatars/${targetId}_500.jpg`;
+      const timestamp = Date.now();
+      const smallPath = `uploads/avatars/${targetId}_${timestamp}_100.jpg`;
+      const largePath = `uploads/avatars/${targetId}_${timestamp}_500.jpg`;
 
       await sharp(req.file.buffer)
         .resize(100, 100)
@@ -115,6 +114,16 @@ router.post(
         .resize(500, 500)
         .jpeg()
         .toFile(largePath);
+
+      const oldUser = await User.findById(targetId);
+      if (oldUser.avatar) {
+        if (oldUser.avatar.small) {
+          try { fs.unlinkSync(oldUser.avatar.small); } catch (e) {}
+        }
+        if (oldUser.avatar.large) {
+          try { fs.unlinkSync(oldUser.avatar.large); } catch (e) {}
+        }
+      }
 
       const user = await User.findByIdAndUpdate(
         targetId,
@@ -127,14 +136,21 @@ router.post(
         { new: true }
       ).select('-password');
 
-      res.json(user);
+      res.json({
+        ...user.toObject(),
+        avatar: {
+          small: `http://localhost:3000/${smallPath.replace(/\\/g, '/')}`,
+          large: `http://localhost:3000/${largePath.replace(/\\/g, '/')}`
+        }
+      });
     } catch (e) {
+      console.error(e);
       res.status(500).json({ message: 'Avatar upload error' });
     }
   }
 );
 
-// удаление аватара
+// delete
 router.delete('/:id/avatar', auth, async (req, res) => {
   try {
     const targetId = req.params.id;
@@ -155,7 +171,13 @@ router.delete('/:id/avatar', auth, async (req, res) => {
     user.avatar = undefined;
     await user.save();
 
-    res.json({ message: 'Avatar removed' });
+    res.json({ 
+      message: 'Avatar removed',
+      avatar: {
+        small: 'http://localhost:3000/uploads/avatars/default-100.jpg',
+        large: 'http://localhost:3000/uploads/avatars/default-500.jpg'
+      }
+    });
   } catch (e) {
     res.status(500).json({ message: 'Avatar delete error' });
   }

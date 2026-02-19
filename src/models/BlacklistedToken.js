@@ -8,7 +8,7 @@ const BlacklistedTokenSchema = new mongoose.Schema({
   expiresAt: {
     type: Date,
     required: true,
-    index: { expires: 0 }, // Mongo сам удалит токен
+    index: { expires: 0 },
   },
 });
 

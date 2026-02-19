@@ -9,7 +9,7 @@ const { buildAvatar } = require('../utils/avatar');
 
 const router = express.Router();
 
-// Register
+// register
 router.post('/register', async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -43,7 +43,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// Login
+// login
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -101,7 +101,7 @@ router.get('/admin', auth, role(['admin']), (req, res) => {
   res.json({ message: 'Welcome admin' });
 });
 
-// назначить админа
+// set admin
 router.post('/make-admin', async (req, res) => {
   try {
     const { email } = req.body;
